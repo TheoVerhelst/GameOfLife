@@ -1,3 +1,4 @@
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include "Grid.hpp"
 #include "GameBoard.hpp"
@@ -7,7 +8,7 @@ int main(int argc, char** argv)
 	// Default parameters
 	sf::Time updateTime{sf::seconds(0.1)};
 	double aliveProbability{0.2};
-	std::size_t height{20}, width{20};
+	std::size_t height{70}, width{130};
 	float cellSize{10.f};
 
 	if(argc > 3)
@@ -17,12 +18,14 @@ int main(int argc, char** argv)
 	if(argc > 1)
 		updateTime = sf::seconds(std::stod(argv[1]));
 
-    sf::RenderWindow window(sf::VideoMode(cellSize * width, cellSize * height), "SFML window");
+    sf::RenderWindow window(sf::VideoMode(cellSize * width, cellSize * height), "The Great Game of Life");
 
 	Grid grid{height, width, aliveProbability};
 	GameBoard gameBoard{grid, {cellSize * width, cellSize * height}};
 
 	sf::Clock simulationClock;
+	sf::Clock wholeSimulationClock;
+	float simulationTicks{0.f};
 
     while(window.isOpen())
 	{
@@ -41,7 +44,9 @@ int main(int argc, char** argv)
 		}
 
         window.clear();
+		simulationTicks += 1.f;
         window.draw(gameBoard);
         window.display();
     }
+	std::cout << "In average " << (simulationTicks / wholeSimulationClock.getElapsedTime().asSeconds()) << " frame/s" << std::endl;
 }
