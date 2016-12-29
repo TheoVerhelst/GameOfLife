@@ -29,14 +29,12 @@ const State& Cell::getState() const
 
 std::size_t Cell::countAliveNeighbours(const Grid& grid, std::size_t row, std::size_t col) const
 {
-	std::size_t res{0},
-				up{row == 0 ? row : row - 1},
-				down{row == grid.getHeight() - 1 ? row : row + 1},
-				left{col == 0 ? col : col - 1},
-				right{col == grid.getWidth() - 1 ? col : col + 1};
-	for(std::size_t i{up}; i <= down; ++i)
-		for(std::size_t j{left}; j <= right; ++j)
-			if(not (i == row and j == col) and grid.getState(i, j) == State::Alive)
+	int rowInt{static_cast<int>(row)}, colInt{static_cast<int>(col)};
+	int gridHeight{static_cast<int>(grid.getHeight())}, gridWidth{static_cast<int>(grid.getWidth())};
+	std::size_t res{0};
+	for(int i{-1}; i <= 1; ++i)
+		for(int j{-1}; j <= 1; ++j)
+			if(not (i == 0 and j == 0) and grid.getState((row + i)  % gridHeight, (col + j) % gridWidth) == State::Alive)
 				res += 1;
 	return res;
 }
