@@ -7,7 +7,7 @@ int main(int argc, char** argv)
 	// Default parameters
 	sf::Time updateTime{sf::seconds(0.1)};
 	double aliveProbability{0.2};
-	std::size_t height{60}, width{80};
+	std::size_t height{20}, width{20};
 	float cellSize{10.f};
 
 	if(argc > 3)

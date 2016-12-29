@@ -2,17 +2,14 @@
 #include "Grid.hpp"
 #include "Cell.hpp"
 
-Cell::Cell(const State& state, const Grid& grid, std::size_t row, std::size_t col):
-	_state{state},
-	_grid{grid},
-	_row{row},
-	_col{col}
+Cell::Cell(const State& state):
+	_state{state}
 {
 }
 
-void Cell::update()
+void Cell::update(const Grid& grid, std::size_t row, std::size_t col)
 {
-	std::size_t aliveNeighbours{countAliveNeighbours()};
+	const std::size_t aliveNeighbours{countAliveNeighbours(grid, row, col)};
 	if(_state == State::Alive)
 	{
 		if(not (aliveNeighbours == 2 or aliveNeighbours == 3))
@@ -30,16 +27,16 @@ const State& Cell::getState() const
 	return _state;
 }
 
-std::size_t Cell::countAliveNeighbours() const
+std::size_t Cell::countAliveNeighbours(const Grid& grid, std::size_t row, std::size_t col) const
 {
 	std::size_t res{0},
-				up{_row == 0 ? _row : _row - 1},
-				down{_row == _grid.getHeight() - 1 ? _row : _row + 1},
-				left{_col == 0 ? _col : _col - 1},
-				right{_col == _grid.getWidth() - 1 ? _col : _col + 1};
+				up{row == 0 ? row : row - 1},
+				down{row == grid.getHeight() - 1 ? row : row + 1},
+				left{col == 0 ? col : col - 1},
+				right{col == grid.getWidth() - 1 ? col : col + 1};
 	for(std::size_t i{up}; i <= down; ++i)
 		for(std::size_t j{left}; j <= right; ++j)
-			if(not (i == _row and j == _col) and _grid.getState(i, j) == State::Alive)
+			if(not (i == row and j == col) and grid.getState(i, j) == State::Alive)
 				res += 1;
 	return res;
 }
