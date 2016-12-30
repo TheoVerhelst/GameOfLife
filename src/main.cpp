@@ -20,13 +20,13 @@ int main(int argc, char** argv)
 	bool useGradient;
 
 	// Declare the options
-	program_options::options_description options("Allowed options");
+	program_options::options_description options("Options");
 	options.add_options()
 		("help", "show this help and exit")
 		("alive-probability,p", program_options::value<double>(&aliveProbability)->default_value(0.5),
 			"proportion of alive cells at the first step")
 		("update-time,t", program_options::value<float>(&updateTimeDouble)->default_value(0.25f),
-			"minimum time between two steps")
+			"minimum time between two steps, in seconds")
 		("jobs,j", program_options::value<std::size_t>(&jobsCount)->default_value(1),
 			"number of parallel jobs to run")
 		("width,w", program_options::value<std::size_t>(&width)->default_value(20),
@@ -45,6 +45,7 @@ int main(int argc, char** argv)
 
 	if(variablesMap.count("help"))
 	{
+		std::cout << "Usage: " << argv[0] << " [OPTION...]" << std::endl << std::endl;
 		std::cout << options << std::endl;
 		return 0;
 	}
