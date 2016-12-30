@@ -10,7 +10,7 @@
 class GameBoard : public sf::Drawable, sf::Transformable
 {
 	public:
-		GameBoard(const Grid& grid, sf::Vector2f size);
+		GameBoard(const Grid& grid, sf::Vector2f size, bool useGradient=false);
 		virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 		void update(std::size_t jobsCount);
 
@@ -22,7 +22,7 @@ class GameBoard : public sf::Drawable, sf::Transformable
 		sf::Vector2f _size;
 		std::vector<std::vector<sf::RectangleShape>> _squares;
 		const std::map<State, sf::Color> _stateToColor;
-		bool _gradient;
+		bool _useGradient;
 		double _gradientTime;
 		double _gradientSpeed;
 };

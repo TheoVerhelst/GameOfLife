@@ -4,13 +4,13 @@
 #include <iostream>
 #include "GameBoard.hpp"
 
-GameBoard::GameBoard(const Grid& grid, sf::Vector2f size):
+GameBoard::GameBoard(const Grid& grid, sf::Vector2f size, bool useGradient):
 	_grid{grid},
 	_size{size},
 	_squares{},
 	_stateToColor{{State::Alive, sf::Color(255, 255, 255)},
 				  {State::Death, sf::Color(0, 0, 0)}},
-	_gradient{true},
+	_useGradient{useGradient},
 	_gradientTime{0},
 	_gradientSpeed{3.333}
 {
@@ -65,7 +65,7 @@ void GameBoard::updateThreaded(std::size_t from, std::size_t to)
 		for(std::size_t j{fromCol}; j < toCol; ++j)
 		{
 			sf::Color squareColor{_stateToColor.at(_grid.getState(i, j))};
-			if(_gradient)
+			if(_useGradient)
 				squareColor = computeGradient(squareColor, _gradientTime);
 			_squares[i][j].setFillColor(squareColor);
 		}
