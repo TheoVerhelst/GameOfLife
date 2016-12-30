@@ -29,7 +29,6 @@ const State& Cell::getState() const
 
 std::size_t Cell::countAliveNeighbours(const Grid& grid, std::size_t row, std::size_t col) const
 {
-	int rowInt{static_cast<int>(row)}, colInt{static_cast<int>(col)};
 	int gridHeight{static_cast<int>(grid.getHeight())}, gridWidth{static_cast<int>(grid.getWidth())};
 	std::size_t res{0};
 	for(int i{-1}; i <= 1; ++i)
