@@ -24,8 +24,7 @@ int main(int argc, char** argv)
 		("alive-probability,p", program_options::value<double>(&aliveProbability)->default_value(.4),
 			"set probability that initial cell is alive")
 		("update-time,t", program_options::value<float>(&updateTimeDouble)->default_value(.1f),
-			"minimum time between two updates")
-	;
+			"minimum time between two updates");
 
 	program_options::variables_map variablesMap;
 	program_options::store(program_options::parse_command_line(argc, argv, options), variablesMap);
