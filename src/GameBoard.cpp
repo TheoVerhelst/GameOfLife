@@ -1,5 +1,7 @@
 #include <cstdint>
 #include <cmath>
+#include <thread>
+#include <iostream>
 #include "GameBoard.hpp"
 
 GameBoard::GameBoard(const Grid& grid, sf::Vector2f size):
@@ -26,7 +28,7 @@ GameBoard::GameBoard(const Grid& grid, sf::Vector2f size):
 			_squares.back().push_back(square);
 		}
 	}
-	update();
+	update(1);
 }
 
 void GameBoard::draw(sf::RenderTarget &target, sf::RenderStates states) const
@@ -36,12 +38,31 @@ void GameBoard::draw(sf::RenderTarget &target, sf::RenderStates states) const
 			target.draw(square, states);
 }
 
-void GameBoard::update()
+void GameBoard::update(std::size_t jobsCount)
 {
 	_gradientTime += _gradientSpeed;
-	for(std::size_t i{0}; i < _squares.size(); ++i)
+	if(jobsCount > 1)
 	{
-		for(std::size_t j{0}; j < _squares[i].size(); ++j)
+		const std::size_t step{(_grid.getHeight() * _grid.getWidth()) / jobsCount};
+		std::vector<std::thread> threads;
+
+		for(std::size_t i{0}; i < jobsCount; ++i)
+			threads.emplace_back(&GameBoard::updateThreaded, this, i * step, (i + 1) * step);
+		for(auto& thread : threads)
+			thread.join();
+	}
+	else
+		updateThreaded(0, _grid.getHeight() * _grid.getWidth());
+}
+
+void GameBoard::updateThreaded(std::size_t from, std::size_t to)
+{
+	const std::size_t fromLine{from / _grid.getWidth()}, toLine{((to - 1) / _grid.getWidth()) + 1};
+	for(std::size_t i{fromLine}; i < toLine; ++i)
+	{
+		const std::size_t fromCol{i == fromLine ? from % _grid.getWidth() : 0};
+		const std::size_t toCol{i == toLine - 1 ? ((to - 1) % _grid.getWidth() + 1) : _squares[i].size()};
+		for(std::size_t j{fromCol}; j < toCol; ++j)
 		{
 			sf::Color squareColor{_stateToColor.at(_grid.getState(i, j))};
 			if(_gradient)

@@ -12,9 +12,10 @@ class GameBoard : public sf::Drawable, sf::Transformable
 	public:
 		GameBoard(const Grid& grid, sf::Vector2f size);
 		virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
-		void update();
+		void update(std::size_t jobsCount);
 
 	private:
+		void updateThreaded(std::size_t from, std::size_t to);
 		static sf::Color computeGradient(const sf::Color& baseColor, double time);
 
 		const Grid& _grid;

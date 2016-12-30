@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 #Dependencies searching
 find_package(SFML 2.3 COMPONENTS system window graphics REQUIRED)
 find_package(Boost 1.57 COMPONENTS program_options REQUIRED)
+find_package(Threads REQUIRED)
 
 #Set the include directory of the project
 include_directories(
@@ -27,6 +28,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast")
 set(EXTERNAL_LIBRARIES
 	${SFML_LIBRARIES}
 	${Boost_LIBRARIES}
+	${CMAKE_THREAD_LIBS_INIT}
 	)
 
 #Place the executable files in the root directory instead of in src

@@ -11,11 +11,12 @@ namespace program_options = boost::program_options;
 
 int main(int argc, char** argv)
 {
-	// Default parameters
+	// Parameters
 	float updateTimeDouble;
 	double aliveProbability;
 	std::size_t height{50}, width{50};
 	float cellSize{10.f};
+	std::size_t jobsCount;
 
 	// Declare the supported options.
 	program_options::options_description options("Allowed options");
@@ -24,7 +25,10 @@ int main(int argc, char** argv)
 		("alive-probability,p", program_options::value<double>(&aliveProbability)->default_value(.4),
 			"set probability that initial cell is alive")
 		("update-time,t", program_options::value<float>(&updateTimeDouble)->default_value(.1f),
-			"minimum time between two updates");
+			"minimum time between two updates")
+		("jobs,j", program_options::value<std::size_t>(&jobsCount)->default_value(1),
+			"number of parallel jobs to run")
+	;
 
 	program_options::variables_map variablesMap;
 	program_options::store(program_options::parse_command_line(argc, argv, options), variablesMap);
@@ -58,8 +62,8 @@ int main(int argc, char** argv)
         if(simulationClock.getElapsedTime() >= updateTime)
         {
 			simulationClock.restart();
-			grid.update();
-			gameBoard.update();
+			grid.update(jobsCount);
+			gameBoard.update(jobsCount);
 		}
 
         window.clear();
