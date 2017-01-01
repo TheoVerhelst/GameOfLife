@@ -1,6 +1,8 @@
 #include <random>
-#include <thread>
+#include "ThreadHelper.hpp"
 #include "Grid.hpp"
+
+using namespace std::placeholders;
 
 Grid::Grid(std::size_t height, std::size_t width, double aliveProbability)
 {
@@ -31,21 +33,13 @@ const State& Grid::getState(std::size_t row, std::size_t col) const
 void Grid::update(std::size_t jobsCount)
 {
 	const Grid copy(*this);
-	if(jobsCount > 1)
-	{
-		const std::size_t step{(getHeight() * getWidth()) / jobsCount};
-		std::vector<std::thread> threads;
-
-		for(std::size_t i{0}; i < jobsCount; ++i)
-			threads.emplace_back(&Grid::updateThreaded, this, copy, i * step, (i + 1) * step);
-		for(auto& thread : threads)
-			thread.join();
-	}
-	else
-		updateThreaded(copy, 0, getHeight() * getWidth());
+	ThreadHelper::dispatchWork(jobsCount,
+		std::bind(&Grid::updateThreaded, this, _1, _2, _3),
+		getHeight() * getWidth(),
+		copy);
 }
 
-void Grid::updateThreaded(const Grid& copy, std::size_t from, std::size_t to)
+void Grid::updateThreaded(std::size_t from, std::size_t to, const Grid& copy)
 {
 	const std::size_t fromLine{from / getWidth()}, toLine{((to - 1) / getWidth()) + 1};
 	for(std::size_t i{fromLine}; i < toLine; ++i)

@@ -16,7 +16,7 @@ class Grid
 		std::size_t getWidth() const;
 
 	private:
-		void updateThreaded(const Grid& copy, std::size_t from, std::size_t to);
+		void updateThreaded(std::size_t from, std::size_t to, const Grid& copy);
 
 		std::vector<std::vector<Cell>> _data;
 };

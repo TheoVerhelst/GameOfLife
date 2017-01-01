@@ -1,8 +1,10 @@
 #include <cstdint>
 #include <cmath>
-#include <thread>
 #include <iostream>
+#include "ThreadHelper.hpp"
 #include "GameBoard.hpp"
+
+using namespace std::placeholders;
 
 GameBoard::GameBoard(const Grid& grid, sf::Vector2f size, bool useGradient):
 	_grid{grid},
@@ -41,18 +43,9 @@ void GameBoard::draw(sf::RenderTarget &target, sf::RenderStates states) const
 void GameBoard::update(std::size_t jobsCount)
 {
 	_gradientTime += _gradientSpeed;
-	if(jobsCount > 1)
-	{
-		const std::size_t step{(_grid.getHeight() * _grid.getWidth()) / jobsCount};
-		std::vector<std::thread> threads;
-
-		for(std::size_t i{0}; i < jobsCount; ++i)
-			threads.emplace_back(&GameBoard::updateThreaded, this, i * step, (i + 1) * step);
-		for(auto& thread : threads)
-			thread.join();
-	}
-	else
-		updateThreaded(0, _grid.getHeight() * _grid.getWidth());
+	ThreadHelper::dispatchWork(jobsCount,
+		std::bind(&GameBoard::updateThreaded, this, _1, _2),
+		_grid.getHeight() * _grid.getWidth());
 }
 
 void GameBoard::updateThreaded(std::size_t from, std::size_t to)
