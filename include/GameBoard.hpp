@@ -15,7 +15,6 @@ class GameBoard : public sf::Drawable, sf::Transformable
 		void update(std::size_t jobsCount);
 
 	private:
-		void drawThreaded(std::size_t from, std::size_t to, sf::RenderTarget& target, sf::RenderStates states) const;
 		void updateThreaded(std::size_t from, std::size_t to);
 		static sf::Color computeGradient(const sf::Color& baseColor, double time);
 

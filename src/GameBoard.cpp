@@ -36,21 +36,10 @@ GameBoard::GameBoard(const Grid& grid, sf::Vector2f size, bool useGradient):
 
 void GameBoard::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	ThreadHelper::dispatchWork(_jobsCount,
-		std::bind(&GameBoard::drawThreaded, this, _1, _2, std::ref(target), states),
-		_grid.getHeight() * _grid.getWidth());
-}
-
-void GameBoard::drawThreaded(std::size_t from, std::size_t to, sf::RenderTarget& target, sf::RenderStates states) const
-{
-	const std::size_t fromLine{from / _grid.getWidth()}, toLine{((to - 1) / _grid.getWidth()) + 1};
-	for(std::size_t i{fromLine}; i < toLine; ++i)
-	{
-		const std::size_t fromCol{i == fromLine ? from % _grid.getWidth() : 0};
-		const std::size_t toCol{i == toLine - 1 ? ((to - 1) % _grid.getWidth() + 1) : _squares[i].size()};
-		for(std::size_t j{fromCol}; j < toCol; ++j)
-			target.draw(_squares[i][j], states);
-	}
+	for(std::size_t i{0}; i < _squares.size(); ++i)
+		for(std::size_t j{0}; j < _squares[i].size(); ++j)
+			if(_grid.getState(i, j) != State::Death)
+				target.draw(_squares[i][j], states);
 }
 
 void GameBoard::update(std::size_t jobsCount)
