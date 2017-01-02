@@ -25,11 +25,6 @@ Grid::Grid(std::size_t height, std::size_t width, double aliveProbability)
 	}
 }
 
-const State& Grid::getState(std::size_t row, std::size_t col) const
-{
-	return _data[row][col].getState();
-}
-
 void Grid::update(std::size_t jobsCount)
 {
 	const Grid copy(*this);
@@ -48,17 +43,4 @@ void Grid::updateThreaded(std::size_t from, std::size_t to, const Grid& copy)
 		for(std::size_t j{fromCol}; j < toCol; ++j)
 			_data[i][j].update(copy, i, j);
 	}
-}
-
-std::size_t Grid::getHeight() const
-{
-	return _data.size();
-}
-
-std::size_t Grid::getWidth() const
-{
-	if(not _data.empty())
-		return _data.front().size();
-	else
-		return 0;
 }
