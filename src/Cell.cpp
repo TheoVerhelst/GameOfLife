@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <array>
+#include <utility>
 #include "Grid.hpp"
 #include "Cell.hpp"
 
@@ -29,11 +31,14 @@ const State& Cell::getState() const
 
 std::size_t Cell::countAliveNeighbours(const Grid& grid, std::size_t row, std::size_t col) const
 {
-	int gridHeight{static_cast<int>(grid.getHeight())}, gridWidth{static_cast<int>(grid.getWidth())};
-	std::size_t res{0};
-	for(int i{-1}; i <= 1; ++i)
-		for(int j{-1}; j <= 1; ++j)
-			if(not (i == 0 and j == 0) and grid.getState((row + i)  % gridHeight, (col + j) % gridWidth) == State::Alive)
-				res += 1;
+	const int gridHeight{static_cast<int>(grid.getHeight())}, gridWidth{static_cast<int>(grid.getWidth())};
+	std::array<std::pair<int, int>, 8> neighboursToCheck{{
+		{-1, -1}, {-1, 0}, {-1, 1},
+		{ 0, -1},          { 0, 1},
+		{ 1, -1}, { 1, 0}, { 1, 1}}};
+	std::size_t res{0UL};
+	for(auto& neighbour : neighboursToCheck)
+		if(grid.getState((row + neighbour.first)  % gridHeight, (col + neighbour.second) % gridWidth) == State::Alive)
+			++res;
 	return res;
 }
