@@ -34,9 +34,8 @@ void Grid::update(std::size_t jobsCount)
 {
 	const Grid copy(*this);
 	ThreadHelper::dispatchWork(jobsCount,
-		std::bind(&Grid::updateThreaded, this, _1, _2, _3),
-		getHeight() * getWidth(),
-		copy);
+		std::bind(&Grid::updateThreaded, this, _1, _2, std::cref(copy)),
+		getHeight() * getWidth());
 }
 
 void Grid::updateThreaded(std::size_t from, std::size_t to, const Grid& copy)

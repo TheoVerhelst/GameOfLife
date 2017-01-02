@@ -14,7 +14,8 @@ GameBoard::GameBoard(const Grid& grid, sf::Vector2f size, bool useGradient):
 				  {State::Death, sf::Color(0, 0, 0)}},
 	_useGradient{useGradient},
 	_gradientTime{0},
-	_gradientSpeed{3.333}
+	_gradientSpeed{3.333},
+	_jobsCount{1}
 {
 	std::size_t height{grid.getHeight()};
 	std::size_t width{grid.getWidth()};
@@ -33,15 +34,28 @@ GameBoard::GameBoard(const Grid& grid, sf::Vector2f size, bool useGradient):
 	update(1);
 }
 
-void GameBoard::draw(sf::RenderTarget &target, sf::RenderStates states) const
+void GameBoard::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	for(auto& line : _squares)
-		for(auto& square : line)
-			target.draw(square, states);
+	ThreadHelper::dispatchWork(_jobsCount,
+		std::bind(&GameBoard::drawThreaded, this, _1, _2, std::ref(target), states),
+		_grid.getHeight() * _grid.getWidth());
+}
+
+void GameBoard::drawThreaded(std::size_t from, std::size_t to, sf::RenderTarget& target, sf::RenderStates states) const
+{
+	const std::size_t fromLine{from / _grid.getWidth()}, toLine{((to - 1) / _grid.getWidth()) + 1};
+	for(std::size_t i{fromLine}; i < toLine; ++i)
+	{
+		const std::size_t fromCol{i == fromLine ? from % _grid.getWidth() : 0};
+		const std::size_t toCol{i == toLine - 1 ? ((to - 1) % _grid.getWidth() + 1) : _squares[i].size()};
+		for(std::size_t j{fromCol}; j < toCol; ++j)
+			target.draw(_squares[i][j], states);
+	}
 }
 
 void GameBoard::update(std::size_t jobsCount)
 {
+	_jobsCount = jobsCount;
 	_gradientTime += _gradientSpeed;
 	ThreadHelper::dispatchWork(jobsCount,
 		std::bind(&GameBoard::updateThreaded, this, _1, _2),

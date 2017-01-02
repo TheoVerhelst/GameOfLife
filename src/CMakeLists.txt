@@ -2,6 +2,7 @@ set(SOURCE_FILES
 	Grid.cpp
 	GameBoard.cpp
 	Cell.cpp
+	ThreadHelper.cpp
 	main.cpp
 	)
 
