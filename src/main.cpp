@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -18,6 +19,10 @@ int main(int argc, char** argv)
 	float cellSize;
 	std::size_t jobsCount;
 	bool useGradient;
+	const std::map<State, sf::Color> stateToColor{
+		{State::Alive, sf::Color(255, 255, 255)},
+		{State::Death, sf::Color(0, 0, 0)}};
+	const State stateNotToDraw{State::Death};
 
 	// Declare the options
 	program_options::options_description options("Options");
@@ -54,7 +59,7 @@ int main(int argc, char** argv)
     sf::RenderWindow window(sf::VideoMode(cellSize * width, cellSize * height), "The Great Game of Life");
 
 	Grid grid{height, width, aliveProbability};
-	GameBoard gameBoard{grid, {cellSize * width, cellSize * height}, useGradient};
+	GameBoard gameBoard{grid, {cellSize * width, cellSize * height}, useGradient, stateToColor, stateNotToDraw};
 
 	sf::Clock simulationClock;
 	sf::Clock wholeSimulationClock;
@@ -76,8 +81,8 @@ int main(int argc, char** argv)
 			gameBoard.update(jobsCount);
 		}
 
-        window.clear();
 		simulationTicks += 1.f;
+        window.clear(stateToColor.at(stateNotToDraw));
         window.draw(gameBoard);
         window.display();
     }

@@ -6,15 +6,16 @@
 
 using namespace std::placeholders;
 
-GameBoard::GameBoard(const Grid& grid, sf::Vector2f size, bool useGradient):
+GameBoard::GameBoard(const Grid& grid, sf::Vector2f size, bool useGradient,
+	const std::map<State, sf::Color>& stateToColor, const State& stateNotToDraw):
 	_grid{grid},
 	_size{size},
 	_squares{},
-	_stateToColor{{State::Alive, sf::Color(255, 255, 255)},
-				  {State::Death, sf::Color(0, 0, 0)}},
 	_useGradient{useGradient},
 	_gradientTime{0},
 	_gradientSpeed{3.333},
+	_stateToColor{stateToColor},
+	_stateNotToDraw{stateNotToDraw},
 	_jobsCount{1}
 {
 	std::size_t height{grid.getHeight()};
@@ -38,7 +39,7 @@ void GameBoard::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	for(std::size_t i{0}; i < _squares.size(); ++i)
 		for(std::size_t j{0}; j < _squares[i].size(); ++j)
-			if(_grid.getState(i, j) != State::Death)
+			if(_grid.getState(i, j) != _stateNotToDraw)
 				target.draw(_squares[i][j], states);
 }
 
