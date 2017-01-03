@@ -85,7 +85,9 @@ int main(int argc, char** argv)
         sf::Event event;
         while(window.pollEvent(event))
         {
-            if(event.type == sf::Event::Closed)
+            if(event.type == sf::Event::Closed
+				or (event.type == sf::Event::KeyPressed
+				and event.key.code == sf::Keyboard::Escape))
                 window.close();
         }
 
