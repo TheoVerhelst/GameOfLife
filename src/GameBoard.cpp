@@ -61,10 +61,14 @@ void GameBoard::updateThreaded(std::size_t from, std::size_t to)
 		const std::size_t toCol{i == toLine - 1 ? ((to - 1) % _grid.getWidth() + 1) : _squares[i].size()};
 		for(std::size_t j{fromCol}; j < toCol; ++j)
 		{
-			sf::Color squareColor{_stateToColor.at(_grid.getState(i, j))};
-			if(_useGradient)
-				squareColor = computeGradient(squareColor, _gradientTime);
-			_squares[i][j].setFillColor(squareColor);
+			const State state{_grid.getState(i, j)};
+			if(state != _stateNotToDraw)
+			{
+				sf::Color squareColor{_stateToColor.at(state)};
+				if(_useGradient)
+					squareColor = computeGradient(squareColor, _gradientTime);
+				_squares[i][j].setFillColor(squareColor);
+			}
 		}
 	}
 }
