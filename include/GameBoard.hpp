@@ -26,6 +26,7 @@ class GameBoard : public sf::Drawable, sf::Transformable
 		double _gradientTime;
 		double _gradientSpeed;
 		const std::map<State, sf::Color>& _stateToColor;
+		std::map<State, sf::Color> _stateToGradientColor;
 		const State& _stateNotToDraw;
 		std::size_t _jobsCount;
 };

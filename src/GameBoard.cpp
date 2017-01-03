@@ -15,6 +15,7 @@ GameBoard::GameBoard(const Grid& grid, sf::Vector2f size, bool useGradient,
 	_gradientTime{0},
 	_gradientSpeed{3.333},
 	_stateToColor{stateToColor},
+	_stateToGradientColor{_stateToColor},
 	_stateNotToDraw{stateNotToDraw},
 	_jobsCount{1}
 {
@@ -47,6 +48,12 @@ void GameBoard::update(std::size_t jobsCount)
 {
 	_jobsCount = jobsCount;
 	_gradientTime += _gradientSpeed;
+
+	if(_useGradient)
+		for(auto& pair : _stateToColor)
+			if(pair.first != _stateNotToDraw)
+				_stateToGradientColor[pair.first] = computeGradient(pair.second, _gradientTime);
+
 	ThreadHelper::dispatchWork(jobsCount,
 		std::bind(&GameBoard::updateThreaded, this, _1, _2),
 		_grid.getHeight() * _grid.getWidth());
@@ -64,9 +71,7 @@ void GameBoard::updateThreaded(std::size_t from, std::size_t to)
 			const State state{_grid.getState(i, j)};
 			if(state != _stateNotToDraw)
 			{
-				sf::Color squareColor{_stateToColor.at(state)};
-				if(_useGradient)
-					squareColor = computeGradient(squareColor, _gradientTime);
+				sf::Color squareColor{_stateToGradientColor.at(state)};
 				_squares[i][j].setFillColor(squareColor);
 			}
 		}
