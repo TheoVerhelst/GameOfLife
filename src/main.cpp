@@ -16,9 +16,10 @@ int main(int argc, char** argv)
 	float updateTimeDouble;
 	double aliveProbability;
 	std::size_t height, width;
-	float cellSize;
+	std::size_t cellSize;
 	std::size_t jobsCount;
 	bool useGradient;
+	bool fullscreen;
 	const std::map<State, sf::Color> stateToColor{
 		{State::Alive, sf::Color(255, 255, 255)},
 		{State::Death, sf::Color(0, 0, 0)}};
@@ -40,8 +41,11 @@ int main(int argc, char** argv)
 			"height of the grid, in number of cases")
 		("gradient,g", boost::program_options::bool_switch(&useGradient),
 			"use a fancy gradient feature")
-		("cell-size,c", program_options::value<float>(&cellSize)->default_value(10.f),
+		("cell-size,c", program_options::value<std::size_t>(&cellSize)->default_value(10),
 			"size of a cell, in pixels")
+		("fullscreen,f", boost::program_options::bool_switch(&fullscreen),
+			"make the application fullscreen at the maximum resolution.\n"
+			"When set, cell-size is ignored")
 	;
 
 	program_options::variables_map variablesMap;
@@ -55,12 +59,23 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	sf::Time updateTime{sf::seconds(updateTimeDouble)};
-    sf::RenderWindow window(sf::VideoMode(cellSize * width, cellSize * height), "The Great Game of Life");
+	sf::VideoMode videoMode{static_cast<unsigned int>(cellSize * width),
+							static_cast<unsigned int>(cellSize * height)};
+	sf::Uint32 windowStyle{sf::Style::Default};
+	std::string windowTitle{"The Great Game of Life"};
 
+	if(fullscreen)
+	{
+		videoMode = sf::VideoMode::getFullscreenModes().front();
+		windowStyle = sf::Style::Fullscreen;
+	}
+
+    sf::RenderWindow window(videoMode, windowTitle, windowStyle);
 	Grid grid{height, width, aliveProbability};
-	GameBoard gameBoard{grid, {cellSize * width, cellSize * height}, useGradient, stateToColor, stateNotToDraw};
-
+	GameBoard gameBoard{grid, {static_cast<float>(videoMode.width),
+							   static_cast<float>(videoMode.height)},
+							   useGradient, stateToColor, stateNotToDraw};
+	sf::Time updateTime{sf::seconds(updateTimeDouble)};
 	sf::Clock simulationClock;
 	sf::Clock wholeSimulationClock;
 	float simulationTicks{0.f};
