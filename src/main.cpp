@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 		windowStyle = sf::Style::Fullscreen;
 	}
 
-    sf::RenderWindow window(videoMode, windowTitle, windowStyle);
+	sf::RenderWindow window(videoMode, windowTitle, windowStyle);
 	Grid grid{height, width, aliveProbability};
 	GameBoard gameBoard{grid, {static_cast<float>(videoMode.width),
 							   static_cast<float>(videoMode.height)},
@@ -80,28 +80,28 @@ int main(int argc, char** argv)
 	sf::Clock wholeSimulationClock;
 	float simulationTicks{0.f};
 
-    while(window.isOpen())
+	while(window.isOpen())
 	{
-        sf::Event event;
-        while(window.pollEvent(event))
-        {
-            if(event.type == sf::Event::Closed
+		sf::Event event;
+		while(window.pollEvent(event))
+		{
+			if(event.type == sf::Event::Closed
 				or (event.type == sf::Event::KeyPressed
 				and event.key.code == sf::Keyboard::Escape))
-                window.close();
-        }
+				window.close();
+		}
 
-        if(simulationClock.getElapsedTime() >= updateTime)
-        {
+		if(simulationClock.getElapsedTime() >= updateTime)
+		{
 			simulationClock.restart();
 			grid.update(jobsCount);
 			gameBoard.update(jobsCount);
 		}
 
 		simulationTicks += 1.f;
-        window.clear(stateToColor.at(stateNotToDraw));
-        window.draw(gameBoard);
-        window.display();
-    }
+		window.clear(stateToColor.at(stateNotToDraw));
+		window.draw(gameBoard);
+		window.display();
+	}
 	std::cout << "In average " << (simulationTicks / wholeSimulationClock.getElapsedTime().asSeconds()) << " frame/s" << std::endl;
 }

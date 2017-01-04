@@ -70,10 +70,7 @@ void GameBoard::updateThreaded(std::size_t from, std::size_t to)
 		{
 			const State state{_grid.getState(i, j)};
 			if(state != _stateNotToDraw)
-			{
-				sf::Color squareColor{_stateToGradientColor.at(state)};
-				_squares[i][j].setFillColor(squareColor);
-			}
+				_squares[i][j].setFillColor(_stateToGradientColor.at(state));
 		}
 	}
 }
