@@ -6,13 +6,15 @@
 
 using namespace std::placeholders;
 
-GameBoard::GameBoard(const Grid& grid, sf::Vector2u size, bool useGradient,
-	const std::map<State, sf::Color>& stateToColor, const State& stateNotToDraw):
+GameBoard::GameBoard(const Grid& grid, sf::Vector2u size,
+	const std::map<State, sf::Color>& stateToColor,
+	const State& stateNotToDraw, bool useGradient, bool watercolour):
 	_grid{grid},
 	_size{size},
 	_squareSize{0u, 0u},
 	_image{},
 	_useGradient{useGradient},
+	_watercolour{watercolour},
 	_gradientTime{0},
 	_gradientSpeed{3.333},
 	_stateToColor{stateToColor},
@@ -45,7 +47,8 @@ void GameBoard::update(std::size_t jobsCount)
 			if(pair.first != _stateNotToDraw)
 				_stateToGradientColor[pair.first] = computeGradient(pair.second, _gradientTime);
 
-	_image.create(_size.x, _size.y, _stateToGradientColor[_stateNotToDraw]);
+	if(not _watercolour)
+		_image.create(_size.x, _size.y, _stateToGradientColor[_stateNotToDraw]);
 	ThreadHelper::dispatchWork(jobsCount,
 		std::bind(&GameBoard::updateThreaded, this, _1, _2),
 		_grid.getHeight() * _grid.getWidth());

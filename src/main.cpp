@@ -20,6 +20,7 @@ int main(int argc, char** argv)
 	std::size_t jobsCount;
 	bool useGradient;
 	bool fullscreen;
+	bool watercolour;
 	const std::map<State, sf::Color> stateToColor{
 		{State::Alive, sf::Color(255, 255, 255)},
 		{State::Death, sf::Color(0, 0, 0)}};
@@ -46,6 +47,9 @@ int main(int argc, char** argv)
 		("fullscreen,f", boost::program_options::bool_switch(&fullscreen),
 			"make the application fullscreen at the maximum resolution.\n"
 			"When set, cell-size is ignored")
+		("watercolour", boost::program_options::bool_switch(&watercolour),
+			"turn on watercolour mode. Implies gradient. This is not really "
+			"useful, but rather pretty.")
 	;
 
 	program_options::variables_map variablesMap;
@@ -58,6 +62,9 @@ int main(int argc, char** argv)
 		std::cout << options << std::endl;
 		return 0;
 	}
+
+	if(watercolour)
+		useGradient = true;
 
 	sf::VideoMode videoMode{static_cast<unsigned int>(cellSize * width),
 							static_cast<unsigned int>(cellSize * height)};
@@ -72,7 +79,8 @@ int main(int argc, char** argv)
 
 	sf::RenderWindow window(videoMode, windowTitle, windowStyle);
 	Grid grid{height, width, aliveProbability};
-	GameBoard gameBoard{grid, {videoMode.width, videoMode.height}, useGradient, stateToColor, stateNotToDraw};
+	GameBoard gameBoard{grid, {videoMode.width, videoMode.height}, stateToColor,
+			stateNotToDraw, useGradient, watercolour};
 	sf::Time updateTime{sf::seconds(updateTimeDouble)};
 	sf::Clock simulationClock;
 	sf::Clock wholeSimulationClock;
@@ -102,4 +110,5 @@ int main(int argc, char** argv)
 		window.display();
 	}
 	std::cout << "In average " << (simulationTicks / wholeSimulationClock.getElapsedTime().asSeconds()) << " frame/s" << std::endl;
+
 }
