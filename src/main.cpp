@@ -72,9 +72,7 @@ int main(int argc, char** argv)
 
 	sf::RenderWindow window(videoMode, windowTitle, windowStyle);
 	Grid grid{height, width, aliveProbability};
-	GameBoard gameBoard{grid, {static_cast<float>(videoMode.width),
-							   static_cast<float>(videoMode.height)},
-							   useGradient, stateToColor, stateNotToDraw};
+	GameBoard gameBoard{grid, {videoMode.width, videoMode.height}, useGradient, stateToColor, stateNotToDraw};
 	sf::Time updateTime{sf::seconds(updateTimeDouble)};
 	sf::Clock simulationClock;
 	sf::Clock wholeSimulationClock;

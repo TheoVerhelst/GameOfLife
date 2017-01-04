@@ -6,11 +6,12 @@
 
 using namespace std::placeholders;
 
-GameBoard::GameBoard(const Grid& grid, sf::Vector2f size, bool useGradient,
+GameBoard::GameBoard(const Grid& grid, sf::Vector2u size, bool useGradient,
 	const std::map<State, sf::Color>& stateToColor, const State& stateNotToDraw):
 	_grid{grid},
 	_size{size},
-	_squares{},
+	_squareSize{0u, 0u},
+	_image{},
 	_useGradient{useGradient},
 	_gradientTime{0},
 	_gradientSpeed{3.333},
@@ -19,29 +20,19 @@ GameBoard::GameBoard(const Grid& grid, sf::Vector2f size, bool useGradient,
 	_stateNotToDraw{stateNotToDraw},
 	_jobsCount{1}
 {
-	std::size_t height{grid.getHeight()};
-	std::size_t width{grid.getWidth()};
-	sf::Vector2f squareSize{_size.x / static_cast<float>(width), _size.y / static_cast<float>(height)};
-
-	for(std::size_t i{0}; i < height; ++i)
-	{
-		_squares.emplace_back();
-		for(std::size_t j{0}; j < width; ++j)
-		{
-			sf::RectangleShape square(squareSize);
-			square.setPosition(squareSize.x * static_cast<float>(j), squareSize.y * static_cast<float>(i));
-			_squares.back().push_back(square);
-		}
-	}
+	const std::size_t height{grid.getHeight()};
+	const std::size_t width{grid.getWidth()};
+	_squareSize.x = _size.x / width;
+	_squareSize.y = _size.y / height;
+	_image.create(_size.x, _size.y, _stateToGradientColor[_stateNotToDraw]);
+	_texture.loadFromImage(_image);
+	_sprite.setTexture(_texture, true);
 	update(1);
 }
 
 void GameBoard::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	for(std::size_t i{0}; i < _squares.size(); ++i)
-		for(std::size_t j{0}; j < _squares[i].size(); ++j)
-			if(_grid.getState(i, j) != _stateNotToDraw)
-				target.draw(_squares[i][j], states);
+	target.draw(_sprite, states);
 }
 
 void GameBoard::update(std::size_t jobsCount)
@@ -54,9 +45,11 @@ void GameBoard::update(std::size_t jobsCount)
 			if(pair.first != _stateNotToDraw)
 				_stateToGradientColor[pair.first] = computeGradient(pair.second, _gradientTime);
 
+	_image.create(_size.x, _size.y, _stateToGradientColor[_stateNotToDraw]);
 	ThreadHelper::dispatchWork(jobsCount,
 		std::bind(&GameBoard::updateThreaded, this, _1, _2),
 		_grid.getHeight() * _grid.getWidth());
+	_texture.loadFromImage(_image);
 }
 
 void GameBoard::updateThreaded(std::size_t from, std::size_t to)
@@ -65,12 +58,14 @@ void GameBoard::updateThreaded(std::size_t from, std::size_t to)
 	for(std::size_t i{fromLine}; i < toLine; ++i)
 	{
 		const std::size_t fromCol{i == fromLine ? from % _grid.getWidth() : 0};
-		const std::size_t toCol{i == toLine - 1 ? ((to - 1) % _grid.getWidth() + 1) : _squares[i].size()};
+		const std::size_t toCol{i == toLine - 1 ? ((to - 1) % _grid.getWidth() + 1) : _grid.getWidth()};
 		for(std::size_t j{fromCol}; j < toCol; ++j)
 		{
 			const State state{_grid.getState(i, j)};
 			if(state != _stateNotToDraw)
-				_squares[i][j].setFillColor(_stateToGradientColor.at(state));
+				for(std::size_t k{i * _squareSize.y}; k < (i + 1) * _squareSize.y; ++k)
+					for(std::size_t l{j * _squareSize.x}; l < (j + 1) * _squareSize.x; ++l)
+						_image.setPixel(l, k, _stateToGradientColor[state]);
 		}
 	}
 }
